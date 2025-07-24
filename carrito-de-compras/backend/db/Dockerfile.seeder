@@ -1,0 +1,16 @@
+        #imagen base de Node.js
+FROM node:18-slim
+
+        #mysql-client para el comando healthcheck
+RUN apt-get update && apt-get install -y default-mysql-client && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/src/app
+
+COPY ../servicio-productos/package*.json ./
+RUN npm install mysql2
+
+        #Copia el script seeder
+COPY ./db/seed.js .
+
+        #Comando para ejecutar el seeder
+CMD [ "node", "seed.js" ]

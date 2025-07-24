@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tienda_db
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - db_data:/var/lib/mysql
+
+  servicio-productos:
+    build: ./backend/servicio-productos
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_DATABASE: tienda_db
+
+  servicio-usuarios:
+    build: ./backend/servicio-usuarios
+    ports:
+      - "3002:3002"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_DATABASE: tienda_db
+
+  servicio-carrito:
+    build: ./backend/servicio-carrito
+    ports:
+      - "3003:3003"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_DATABASE: tienda_db
+
+  seeder:
+    build:
+      context: ./backend
+      dockerfile: db/Dockerfile.seeder
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_DATABASE: tienda_db
+    restart: 'no'
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - servicio-productos
+      - servicio-usuarios
+      - servicio-carrito
+
+volumes:
+  db_data:

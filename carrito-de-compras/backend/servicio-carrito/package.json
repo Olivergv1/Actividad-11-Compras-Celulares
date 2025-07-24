@@ -1,0 +1,14 @@
+{
+  "name": "servicio-carrito",
+  "version": "1.0.0",
+  "description": "Microservicio para gestionar el carrito de compras",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mysql2": "^2.3.3"
+  }
+}
